@@ -17,7 +17,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.test.assertEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SplashScreenViewModelTest {
@@ -39,12 +39,12 @@ class SplashScreenViewModelTest {
 
     @Test
     fun `uiState should emit Success and isReady true after delay and successful remote config`() = runTest {
-        // Arrange
+        // Given
         coEvery { useCase() } returns WrapperResults.Success(Unit)
-
+        //When
         viewModel = SplashScreenViewModel(useCase)
 
-        // Act & Assert
+        //Then
         viewModel.uiState.test {
             // Initial state is Pending
             assertEquals(UiState.Pending, awaitItem())
@@ -76,9 +76,9 @@ class SplashScreenViewModelTest {
     fun `uiState should emit Error when remote config fails`() = runTest {
         // Arrange
         coEvery { useCase() } returns WrapperResults.Error(Exception("Failed"))
-
+        //When
         viewModel = SplashScreenViewModel(useCase)
-
+        //Then
         viewModel.uiState.test {
             assertEquals(UiState.Pending, awaitItem())
 
