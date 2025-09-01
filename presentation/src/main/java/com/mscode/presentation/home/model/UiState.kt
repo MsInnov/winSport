@@ -7,7 +7,8 @@ sealed class UiState {
     data class AvailableLeaguesState(
         val leagues: List<UiLeague> = emptyList(),
         val query: String = "",
-        val suggestions: List<UiLeague> = emptyList()
+        val suggestions: List<UiLeague> = emptyList(),
+        val teams: List<UiTeam> = emptyList()
     ) : UiState()
 
 }

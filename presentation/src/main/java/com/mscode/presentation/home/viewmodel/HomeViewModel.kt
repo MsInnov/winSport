@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.mscode.domain.common.WrapperResults.Error
 import com.mscode.domain.common.WrapperResults.Success
 import com.mscode.domain.availableleagues.usecase.GetAvailableLeaguesUseCase
+import com.mscode.domain.common.WrapperResults
+import com.mscode.domain.leagueteam.model.LeagueTeams
+import com.mscode.domain.leagueteam.usecase.GetLeagueTeamUseCase
 import com.mscode.presentation.home.mapper.LeaguesUiMapper
 import com.mscode.presentation.home.model.UiEvent
+import com.mscode.presentation.home.model.UiLeague
 import com.mscode.presentation.home.model.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getAvailableLeaguesUseCase: GetAvailableLeaguesUseCase,
+    private val getLeagueTeamUseCase: GetLeagueTeamUseCase,
     private val mapper: LeaguesUiMapper
 ) : ViewModel() {
 
@@ -28,8 +33,14 @@ class HomeViewModel @Inject constructor(
     }
 
     fun onEvent(uiEvent: UiEvent){
-        when(uiEvent) {
-            is UiEvent.QueryChanged -> onQueryChanged(uiEvent.query)
+        viewModelScope.launch {
+            when(uiEvent) {
+                is UiEvent.QueryChanged -> onQueryChanged(uiEvent.query)
+                is UiEvent.LeagueSelected -> onLeagueSelected(uiEvent.league)
+                is UiEvent.GetLeagueTeams -> getLeagueTeamUseCase(uiEvent.league).apply {
+                    onLogoTeamsDisplayed(this)
+                }
+            }
         }
     }
 
@@ -54,6 +65,29 @@ class HomeViewModel @Inject constructor(
                 query = query,
                 suggestions = filtered
             )
+        }
+    }
+
+    private fun onLeagueSelected(league: UiLeague) {
+        val currentState = _uiState.value
+        if (currentState is UiState.AvailableLeaguesState) {
+            _uiState.value = currentState.copy(
+                query = league.league,
+                suggestions = emptyList()
+            )
+        }
+    }
+
+    private fun onLogoTeamsDisplayed(leagueTeams: WrapperResults<LeagueTeams>) {
+        when(leagueTeams) {
+            is Success -> {
+                val teams = leagueTeams.data.teams.map { mapper.toUiTeam(it) }
+                val currentState = _uiState.value
+                if (currentState is UiState.AvailableLeaguesState) {
+                    _uiState.value = currentState.copy(teams = teams)
+                }
+            }
+            is Error -> _uiState.value = UiState.Error
         }
     }
 }

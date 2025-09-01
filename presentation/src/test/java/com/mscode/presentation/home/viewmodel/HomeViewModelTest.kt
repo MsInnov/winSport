@@ -4,10 +4,14 @@ import app.cash.turbine.test
 import com.mscode.domain.availableleagues.model.League
 import com.mscode.domain.common.WrapperResults.*
 import com.mscode.domain.availableleagues.usecase.GetAvailableLeaguesUseCase
+import com.mscode.domain.leagueteam.model.LeagueTeam
+import com.mscode.domain.leagueteam.model.LeagueTeams
+import com.mscode.domain.leagueteam.usecase.GetLeagueTeamUseCase
 import com.mscode.presentation.home.mapper.LeaguesUiMapper
 import com.mscode.presentation.home.model.UiEvent
 import com.mscode.presentation.home.model.UiState
 import com.mscode.presentation.home.model.UiLeague
+import com.mscode.presentation.home.model.UiTeam
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -24,6 +28,7 @@ import kotlin.test.assertEquals
 class HomeViewModelTest {
 
     private val getAvailableLeaguesUseCase: GetAvailableLeaguesUseCase = mockk()
+    private val getLeagueTeamUseCase: GetLeagueTeamUseCase = mockk()
     private val leaguesUiMapper: LeaguesUiMapper = mockk()
     private lateinit var viewModel: HomeViewModel
 
@@ -52,7 +57,7 @@ class HomeViewModelTest {
         coEvery { getAvailableLeaguesUseCase() } returns Success(domainLeagues)
         every { leaguesUiMapper.toUiLeague(any()) } returns uiLeagues
         //When
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
 
         //Then
         viewModel.uiState.test {
@@ -66,7 +71,7 @@ class HomeViewModelTest {
     @Test
     fun `should emit Error UiState when use case returns Error`() = runTest {
         coEvery { getAvailableLeaguesUseCase() } returns Error(Exception("Something went wrong"))
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
 
         viewModel.uiState.test {
             assertEquals(UiState.Loading, awaitItem())
@@ -94,7 +99,7 @@ class HomeViewModelTest {
         coEvery { leaguesUiMapper.toUiLeague(domainLeagues) } returns leagues
 
         //When
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
 
         //Then
         viewModel.uiState.test {
@@ -107,6 +112,59 @@ class HomeViewModelTest {
                 availableLeaguesState.copy(
                     query = "english",
                     suggestions = listOf(UiLeague("English Premier League", "Foot"))
+                ),
+                awaitItem()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onLogoTeamsDisplayed when UiEvent is GetLeagueTeams`() = runTest {
+        // Given
+        val leagues = listOf(
+            UiLeague("English Premier League", "Foot"),
+            UiLeague("German Bundesliga", "Foot"),
+            UiLeague("French Ligue 1", "Foot")
+        )
+        val domainLeagues = listOf(
+            League(1, "English Premier League", "Foot"),
+            League(2, "German Bundesliga", "Foot"),
+            League(3, "French Ligue 1", "Foot")
+        )
+        val leagueTeam = LeagueTeam(
+            idTeam = "2",
+            strTeam = "PSG",
+            strBadge = null,
+            strLogo = null,
+        )
+        val uiTeam = UiTeam(
+            name = "PSG",
+            logo = null,
+            badge = null,
+        )
+        val leagueTeams = LeagueTeams(
+            teams = listOf(leagueTeam)
+        )
+        val availableLeaguesState = UiState.AvailableLeaguesState(leagues)
+        coEvery { getAvailableLeaguesUseCase() } returns Success(domainLeagues)
+        coEvery { leaguesUiMapper.toUiLeague(domainLeagues) } returns leagues
+        coEvery { leaguesUiMapper.toUiTeam(leagueTeam) } returns uiTeam
+        coEvery { getLeagueTeamUseCase("PSG") } returns Success(leagueTeams)
+
+        //When
+        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
+
+        //Then
+        viewModel.uiState.test {
+            assertEquals(UiState.Loading, awaitItem())
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(availableLeaguesState, awaitItem())
+            viewModel.onEvent(UiEvent.GetLeagueTeams("PSG"))
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertEquals(
+                availableLeaguesState.copy(
+                    teams = listOf(uiTeam),
                 ),
                 awaitItem()
             )

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import com.mscode.domain.common.WrapperResults
 import com.mscode.domain.availableleagues.repository.AvailableLeaguesRepository
-import com.mscode.domain.availableleagues.usecase.GetAvailableLeaguesUseCase
 
 class GetAvailableLeaguesUseCaseTest {
 
