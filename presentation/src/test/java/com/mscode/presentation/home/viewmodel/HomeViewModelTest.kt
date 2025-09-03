@@ -6,7 +6,9 @@ import com.mscode.domain.common.WrapperResults.*
 import com.mscode.domain.availableleagues.usecase.GetAvailableLeaguesUseCase
 import com.mscode.domain.leagueteam.model.LeagueTeam
 import com.mscode.domain.leagueteam.model.LeagueTeams
+import com.mscode.domain.leagueteam.usecase.GetEveryOtherLeagueTeamUseCase
 import com.mscode.domain.leagueteam.usecase.GetLeagueTeamUseCase
+import com.mscode.domain.leagueteam.usecase.SortLeagueTeamsByNameDescendingUseCase
 import com.mscode.presentation.home.mapper.LeaguesUiMapper
 import com.mscode.presentation.home.model.UiEvent
 import com.mscode.presentation.home.model.UiState
@@ -29,6 +31,8 @@ class HomeViewModelTest {
 
     private val getAvailableLeaguesUseCase: GetAvailableLeaguesUseCase = mockk()
     private val getLeagueTeamUseCase: GetLeagueTeamUseCase = mockk()
+    private val getEveryOtherLeagueTeamUseCase: GetEveryOtherLeagueTeamUseCase = mockk()
+    private val sortLeagueTeamsByNameDescendingUseCase: SortLeagueTeamsByNameDescendingUseCase = mockk()
     private val leaguesUiMapper: LeaguesUiMapper = mockk()
     private lateinit var viewModel: HomeViewModel
 
@@ -57,7 +61,13 @@ class HomeViewModelTest {
         coEvery { getAvailableLeaguesUseCase() } returns Success(domainLeagues)
         every { leaguesUiMapper.toUiLeague(any()) } returns uiLeagues
         //When
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(
+            getAvailableLeaguesUseCase,
+            getLeagueTeamUseCase,
+            sortLeagueTeamsByNameDescendingUseCase,
+            getEveryOtherLeagueTeamUseCase,
+            leaguesUiMapper
+        )
 
         //Then
         viewModel.uiState.test {
@@ -71,7 +81,13 @@ class HomeViewModelTest {
     @Test
     fun `should emit Error UiState when use case returns Error`() = runTest {
         coEvery { getAvailableLeaguesUseCase() } returns Error(Exception("Something went wrong"))
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(
+            getAvailableLeaguesUseCase,
+            getLeagueTeamUseCase,
+            sortLeagueTeamsByNameDescendingUseCase,
+            getEveryOtherLeagueTeamUseCase,
+            leaguesUiMapper
+        )
 
         viewModel.uiState.test {
             assertEquals(UiState.Loading, awaitItem())
@@ -99,7 +115,13 @@ class HomeViewModelTest {
         coEvery { leaguesUiMapper.toUiLeague(domainLeagues) } returns leagues
 
         //When
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(
+            getAvailableLeaguesUseCase,
+            getLeagueTeamUseCase,
+            sortLeagueTeamsByNameDescendingUseCase,
+            getEveryOtherLeagueTeamUseCase,
+            leaguesUiMapper
+        )
 
         //Then
         viewModel.uiState.test {
@@ -150,10 +172,18 @@ class HomeViewModelTest {
         coEvery { getAvailableLeaguesUseCase() } returns Success(domainLeagues)
         coEvery { leaguesUiMapper.toUiLeague(domainLeagues) } returns leagues
         coEvery { leaguesUiMapper.toUiTeam(leagueTeam) } returns uiTeam
+        coEvery { sortLeagueTeamsByNameDescendingUseCase(listOf(leagueTeam)) } returns listOf(leagueTeam)
+        coEvery { getEveryOtherLeagueTeamUseCase(listOf(leagueTeam)) } returns listOf(leagueTeam)
         coEvery { getLeagueTeamUseCase("PSG") } returns Success(leagueTeams)
 
         //When
-        viewModel = HomeViewModel(getAvailableLeaguesUseCase, getLeagueTeamUseCase, leaguesUiMapper)
+        viewModel = HomeViewModel(
+            getAvailableLeaguesUseCase,
+            getLeagueTeamUseCase,
+            sortLeagueTeamsByNameDescendingUseCase,
+            getEveryOtherLeagueTeamUseCase,
+            leaguesUiMapper
+        )
 
         //Then
         viewModel.uiState.test {

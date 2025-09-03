@@ -6,7 +6,9 @@ import com.mscode.data.leagueteam.repository.LeagueTeamRepositoryImpl
 import com.mscode.data.network.factory.RetrofitFactory
 import com.mscode.data.remoteconfig.datasource.LocalConfigDataSource
 import com.mscode.domain.leagueteam.repository.LeagueTeamRepository
+import com.mscode.domain.leagueteam.usecase.GetEveryOtherLeagueTeamUseCase
 import com.mscode.domain.leagueteam.usecase.GetLeagueTeamUseCase
+import com.mscode.domain.leagueteam.usecase.SortLeagueTeamsByNameDescendingUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,5 +39,15 @@ class RepositoryModule {
     @Singleton
     fun provideGetLeagueTeamUseCase(repo: LeagueTeamRepository): GetLeagueTeamUseCase =
         GetLeagueTeamUseCase(repo)
+
+    @Provides
+    @Singleton
+    fun provideSortLeagueTeamsByNameDescendingUseCase(): SortLeagueTeamsByNameDescendingUseCase =
+        SortLeagueTeamsByNameDescendingUseCase()
+
+    @Provides
+    @Singleton
+    fun provideGetEveryOtherLeagueTeamUseCase(): GetEveryOtherLeagueTeamUseCase =
+        GetEveryOtherLeagueTeamUseCase()
 
 }

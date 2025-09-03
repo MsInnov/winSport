@@ -7,7 +7,9 @@ import com.mscode.domain.common.WrapperResults.Success
 import com.mscode.domain.availableleagues.usecase.GetAvailableLeaguesUseCase
 import com.mscode.domain.common.WrapperResults
 import com.mscode.domain.leagueteam.model.LeagueTeams
+import com.mscode.domain.leagueteam.usecase.GetEveryOtherLeagueTeamUseCase
 import com.mscode.domain.leagueteam.usecase.GetLeagueTeamUseCase
+import com.mscode.domain.leagueteam.usecase.SortLeagueTeamsByNameDescendingUseCase
 import com.mscode.presentation.home.mapper.LeaguesUiMapper
 import com.mscode.presentation.home.model.UiEvent
 import com.mscode.presentation.home.model.UiLeague
@@ -22,6 +24,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val getAvailableLeaguesUseCase: GetAvailableLeaguesUseCase,
     private val getLeagueTeamUseCase: GetLeagueTeamUseCase,
+    private val sortLeagueTeamsByNameDescendingUseCase: SortLeagueTeamsByNameDescendingUseCase,
+    private val getEveryOtherLeagueTeamUseCase: GetEveryOtherLeagueTeamUseCase,
     private val mapper: LeaguesUiMapper
 ) : ViewModel() {
 
@@ -81,10 +85,12 @@ class HomeViewModel @Inject constructor(
     private fun onLogoTeamsDisplayed(leagueTeams: WrapperResults<LeagueTeams>) {
         when(leagueTeams) {
             is Success -> {
-                val teams = leagueTeams.data.teams.map { mapper.toUiTeam(it) }
+                val teamsSorted = sortLeagueTeamsByNameDescendingUseCase(leagueTeams.data.teams)
+                val teamsOrganized = getEveryOtherLeagueTeamUseCase(teamsSorted)
+                val uiTeam = teamsOrganized.map { mapper.toUiTeam(it) }
                 val currentState = _uiState.value
                 if (currentState is UiState.AvailableLeaguesState) {
-                    _uiState.value = currentState.copy(teams = teams)
+                    _uiState.value = currentState.copy(teams = uiTeam)
                 }
             }
             is Error -> _uiState.value = UiState.Error
