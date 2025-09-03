@@ -24,7 +24,6 @@ fun SplashScreen(
     val uiState by splashScreenViewModel.uiState.collectAsState()
     var hasWaited by remember { mutableStateOf(false) }
 
-    // Lance un délai de 3 secondes
     LaunchedEffect(Unit) {
         delay(3000)
         hasWaited = true
