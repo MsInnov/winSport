@@ -54,6 +54,8 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.gson)
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
 
     implementation(libs.firebase.config.ktx)
     implementation(libs.firebase.analytics.ktx)
@@ -68,6 +70,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.kotlinx.coroutines.test)

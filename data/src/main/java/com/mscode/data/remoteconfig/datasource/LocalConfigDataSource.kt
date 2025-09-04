@@ -6,10 +6,10 @@ import com.mscode.data.remoteconfig.model.Url
 class LocalConfigDataSource {
 
     private val _urls = emptyList<Url>().toMutableList()
-    val urls = _urls
+    val urls: List<Url> = _urls
 
     private val _paths = emptyList<Path>().toMutableList()
-    val paths = _paths
+    val paths: List<Path> = _paths
 
     fun saveUrl(url: Url) {
         _urls.add(url)
