@@ -6,6 +6,7 @@ import com.mscode.data.availableleagues.datasource.AvailableLeaguesLocalDataSour
 import com.mscode.data.availableleagues.datasource.AvailableLeaguesRemoteDataSource
 import com.mscode.data.availableleagues.mapper.LeagueMapper
 import com.mscode.data.remoteconfig.datasource.LocalConfigDataSource
+import com.mscode.data.remoteconfig.model.key_api
 import com.mscode.data.remoteconfig.model.path_all_leagues
 import com.mscode.domain.common.WrapperResults
 import com.mscode.domain.availableleagues.model.League
@@ -30,7 +31,7 @@ class AvailableLeaguesRepositoryImpl(
         val path = localConfigDataSource.paths.firstOrNull{ it.name == path_all_leagues}?.value
             ?: return WrapperResults.Error(Exception("Available Leagues URL missing"))
 
-        return when (val result = remoteDataSource.getAvailableLeagues("123", path)) {
+        return when (val result = remoteDataSource.getAvailableLeagues(baseUrl.keyApi, path)) {
             is WrapperResults.Success -> {
                 val availableLeagues = result.data.leagues.map { availableLeaguesEntity ->
                     leagueMapper.toLeague(

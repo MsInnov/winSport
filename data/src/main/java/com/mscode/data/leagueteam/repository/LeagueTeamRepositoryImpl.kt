@@ -29,7 +29,7 @@ class LeagueTeamRepositoryImpl(
         val remoteDataSource = LeagueTeamRemoteDataSource(api)
         val path = localConfigDataSource.paths.firstOrNull{ it.name == path_search_all_teams }?.value
             ?: return WrapperResults.Error(Exception("Available Leagues URL missing"))
-        return when (val result = remoteDataSource.getLeagueTeam("123", path, league)) {
+        return when (val result = remoteDataSource.getLeagueTeam(baseUrl.keyApi, path, league)) {
             is WrapperResults.Success -> {
                 val leagueTeams = leagueTeamMapper.toLeagueTeams(
                     result.data

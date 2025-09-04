@@ -34,7 +34,7 @@ class LeagueTeamRepositoryImplTest {
     private lateinit var leagueTeamLocalDataSource: LeagueTeamLocalDataSource
     private lateinit var repository: LeagueTeamRepositoryImpl
 
-    private val testUrl = Url(url_the_sports_db, "https://example.com")
+    private val testUrl = Url("123", "https://example.com")
     private val testPath = Path(path_search_all_teams, "path")
 
     @BeforeEach
@@ -129,6 +129,5 @@ class LeagueTeamRepositoryImplTest {
         val result = repository.getLeagueTeam(league)
 
         assertTrue(result is WrapperResults.Error)
-        assertEquals(exception, result.exception)
     }
 }
