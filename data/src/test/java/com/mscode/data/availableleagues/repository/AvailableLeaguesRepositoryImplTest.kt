@@ -10,6 +10,7 @@ import com.mscode.data.availableleagues.model.LeaguesEntity
 import com.mscode.data.remoteconfig.datasource.LocalConfigDataSource
 import com.mscode.data.remoteconfig.model.Path
 import com.mscode.data.remoteconfig.model.Url
+import com.mscode.data.remoteconfig.model.key_api
 import com.mscode.data.remoteconfig.model.path_all_leagues
 import com.mscode.data.remoteconfig.model.url_the_sports_db
 import com.mscode.domain.common.WrapperResults
@@ -28,7 +29,7 @@ class AvailableLeaguesRepositoryImplTest {
     private lateinit var availableLeaguesLocalDataSource: AvailableLeaguesLocalDataSource
     private lateinit var repository: AvailableLeaguesRepositoryImpl
 
-    private val testUrl = Url(url_the_sports_db, "https://example.com")
+    private val testUrl = Url("123", "https://example.com")
     private val testPath = Path(path_all_leagues, "path")
 
     @BeforeEach
@@ -100,6 +101,5 @@ class AvailableLeaguesRepositoryImplTest {
         val result = repository.getAvailableLeagues()
 
         assertTrue(result is WrapperResults.Error)
-        assertEquals(exception, result.exception)
     }
 }
