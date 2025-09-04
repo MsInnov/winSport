@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "464210813935",
-    "project_id": "proto-d1e06",
-    "storage_bucket": "proto-d1e06.firebasestorage.app"
+    "project_number": "952284800652",
+    "project_id": "test-mscode",
+    "storage_bucket": "test-mscode.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:464210813935:android:a33df372ecadfe877a4c1a",
+        "mobilesdk_app_id": "1:952284800652:android:7bb7a1eee4dc2509f8fda9",
         "android_client_info": {
           "package_name": "com.mscode.winsport"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCiJitkqCOkFjNwyihQmV_h-FGRKLH59x4"
+          "current_key": "AIzaSyBcT1k5ACb1cga4FlXFYFtwP50qtnnwKjU"
         }
       ],
       "services": {
