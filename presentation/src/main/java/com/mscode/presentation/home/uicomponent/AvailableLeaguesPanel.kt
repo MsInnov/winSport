@@ -1,5 +1,10 @@
 package com.mscode.presentation.home.uicomponent
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -37,7 +42,12 @@ fun AvailableLeaguesPanel(state: UiState.AvailableLeaguesState, homeViewModel: H
         }
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        TeamsGrid(teams = state.teams)
+        AnimatedVisibility(
+            visible = state.teams.isNotEmpty(),
+            enter = fadeIn(animationSpec = tween(500)) + slideInVertically(animationSpec = tween(500)),
+            exit = ExitTransition.None
+        ) {
+            TeamsGrid(teams = state.teams)
+        }
     }
 }
